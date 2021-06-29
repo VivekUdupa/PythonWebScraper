@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 import time
 
 from bs4 import BeautifulSoup as bsp
+from bs4 import NavigableString
 # Set path to chromedriver
 PATH_new = "/home/vivek/Codelab/JobHunt/PythonDataScraper/Chromedriver/chromedriver"
 driver = webdriver.Chrome(executable_path=PATH_new)
@@ -43,10 +44,29 @@ job_type = [] # Employer type
 job_functions = [] # job roles / expectations
 job_industries = [] # job domain
 
+# Scraping level 1 info
+
+# JOB id, title, company, location and date posted
+
+for job in job_list:
+    
+    # job title
+    
+    # Ignore the items with type NAvigableString as they 
+    # cannot handle .find() with keyword argument
+    if isinstance(job, NavigableString):
+        continue
+    else:
+        titles = job.find("span", class_="screen-reader-text").text
+        job_title.append(titles)
+
+#print(len(job_title))
 
 
+#i = job_title[0]
 
-
+#print(i)
+#print ([ord(p) for p in i])
 
 
 
