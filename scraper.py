@@ -22,12 +22,29 @@ website = "https://www.linkedin.com/jobs/search?keywords=Data%20Analyst&location
 driver.get(website)
 time.sleep(2)
 
+# getting the number of jobs listed in the webpage
 pageSource = driver.page_source
 lxml_soup = bsp(pageSource, 'lxml')
 
 job_list = lxml_soup.find('ul', class_ = 'jobs-search__results-list')
 
 print(f'Collecting info about {len(job_list)} jobs')
+
+# initializing parameters for scraping 
+
+job_id = [] # unique job id
+job_title = [] # posted job title
+job_company = [] # company name 
+job_date = [] # posted date
+job_loc = [] # job location
+job_description = [] # job description 
+job_level = [] # Experience level
+job_type = [] # Employer type
+job_functions = [] # job roles / expectations
+job_industries = [] # job domain
+
+
+
 
 
 
