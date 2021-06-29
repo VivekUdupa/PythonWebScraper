@@ -27,7 +27,7 @@ lxml_soup = bsp(pageSource, 'lxml')
 
 job_list = lxml_soup.find('ul', class_ = 'jobs-search__results-list')
 
-print(f'Collecting info about {len(job_list)} job')
+print(f'Collecting info about {len(job_list)} jobs')
 
 
 
