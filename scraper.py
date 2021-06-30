@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 import time
+import re
 
 from bs4 import BeautifulSoup as bsp
 from bs4 import NavigableString
@@ -68,13 +69,18 @@ for job in job_list:
 #print(i)
 #print ([ord(p) for p in i])
 
+    
+    # job ID
+    ids = job.find('a', href=True)['href']
+    ids = re.findall(r'(?!-)([0-9]*)(?=\?)', ids)[0]
+    job_id.append(ids)
 
+    # company name
+    names = job.find("h4", class_="base-search-card__subtitle").text
+    job_company.append(names)
 
-
-
-
-
-
+print(job_company)
+print("\n \n \n \n", len(job_company))
 
 
 
