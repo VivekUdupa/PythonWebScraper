@@ -2,3 +2,6 @@ References:
 
 1. Selenium documentation 
 https://selenium-python.readthedocs.io/locating-elements.html
+
+2. COde to copy from 
+https://amandeepsaluja.com/extracting-job-information-from-linkedin-jobs-using-beautifulsoup-and-selenium/
