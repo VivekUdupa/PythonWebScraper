@@ -26,23 +26,31 @@ driver.get(website)
 time.sleep(2)
 
 #Scroll down to load more job listings
-scroll_num = 5
-x = 1
+num_jobs = 50
 
-body = driver.find_element_by_css_selector('body')
-body.click()
-while (x < scroll_num):
+
+# getting the number of jobs listed in the webpage
+
+
+# Scroll to find more jobs
+job_list = []
+num_jobs_found = 0
+while(num_jobs_found < num_jobs):
+       
+    pageSource = driver.page_source
+    lxml_soup = bsp(pageSource, 'lxml')
+    
+    job_list.clear()   
+    job_list = lxml_soup.find('ul', class_ = 'jobs-search__results-list')
+    print(f'Collecting info about {len(job_list)} jobs')
+    
+    num_jobs_found = int(len(job_list)/4)
+    
+    body = driver.find_element_by_css_selector('body')
+    body.click()
     body.send_keys(Keys.PAGE_DOWN)
     time.sleep(2)
-    print("scroll ", x)
-    x = x + 1
-# getting the number of jobs listed in the webpage
-pageSource = driver.page_source
-lxml_soup = bsp(pageSource, 'lxml')
 
-job_list = lxml_soup.find('ul', class_ = 'jobs-search__results-list')
-
-print(f'Collecting info about {len(job_list)} jobs')
 
 # initializing parameters for scraping 
 
@@ -60,9 +68,8 @@ job_industries = [] # job domain
 # Scraping level 1 info
 
 # JOB id, title, company, location and date posted
-
 for job in job_list:
-    
+   
     # job title
     
     # Ignore the items with type NAvigableString as they 
@@ -90,8 +97,9 @@ for job in job_list:
     pDate = job.select_one('time')['datetime']
     job_date.append(pDate)
 # Scraping job description and qualifications 
-for j_id in range(1,len(job_id)+1):
-    print(f'scrapping {j_id} / {len(job_id)}')
+#for j_id in range(1,len(job_id)+1):
+for j_id in range(1,3):
+    #print(f'scrapping {j_id} / {len(job_id)}')
     
     # Click on individual job listing 
     job_xpath = '/html/body/div[1]/div/main/section[2]/ul/li[{}]'.format(j_id)
@@ -106,5 +114,6 @@ for j_id in range(1,len(job_id)+1):
     jobdesc_xpath = "//div[@class='show-more-less-html__markup']"
     descs = driver.find_element_by_xpath(jobdesc_xpath).text
     job_description.append(descs)
-    job_description.append("-----New Job-----")
 
+for item, title in enumerate(job_title):
+    print(item, title.strip())
