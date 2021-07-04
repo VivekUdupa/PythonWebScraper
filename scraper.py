@@ -15,6 +15,7 @@ from bs4 import NavigableString
 # Set path to chromedriver
 PATH_new = "/home/vivek/Codelab/JobHunt/PythonDataScraper/Chromedriver/chromedriver"
 driver = webdriver.Chrome(executable_path=PATH_new)
+driver.maximize_window()
 
 # Initialize link to website that is to be scraped
 
@@ -24,6 +25,17 @@ website = "https://www.linkedin.com/jobs/search?keywords=Data%20Analyst&location
 driver.get(website)
 time.sleep(2)
 
+#Scroll down to load more job listings
+scroll_num = 5
+x = 1
+
+body = driver.find_element_by_css_selector('body')
+body.click()
+while (x < scroll_num):
+    body.send_keys(Keys.PAGE_DOWN)
+    time.sleep(2)
+    print("scroll ", x)
+    x = x + 1
 # getting the number of jobs listed in the webpage
 pageSource = driver.page_source
 lxml_soup = bsp(pageSource, 'lxml')
@@ -60,15 +72,6 @@ for job in job_list:
     else:
         titles = job.find("span", class_="screen-reader-text").text
         job_title.append(titles)
-
-#print(len(job_title))
-
-
-#i = job_title[0]
-
-#print(i)
-#print ([ord(p) for p in i])
-
     
     # job ID
     ids = job.find('a', href=True)['href']
@@ -79,76 +82,29 @@ for job in job_list:
     names = job.find("h4", class_="base-search-card__subtitle").text
     job_company.append(names)
 
-print(job_company)
-print("\n \n \n \n", len(job_company))
+    # Job Location
+    locations = job.find("span", class_="job-search-card__location").text
+    job_loc.append(locations)
 
+    # posting date
+    pDate = job.select_one('time')['datetime']
+    job_date.append(pDate)
+# Scraping job description and qualifications 
+for j_id in range(1,len(job_id)+1):
+    print(f'scrapping {j_id} / {len(job_id)}')
+    
+    # Click on individual job listing 
+    job_xpath = '/html/body/div[1]/div/main/section[2]/ul/li[{}]'.format(j_id)
+    driver.find_element_by_xpath(job_xpath).click()
+    time.sleep(3)
 
+    # click "show more" 
+    driver.find_element_by_xpath("//button[contains(text(),'Show more')]").click()
+    time.sleep(3)
 
-
-
-
-
-
-
-
-# ========================================================= References ====================================
-'''
-# search and input Job title and desired job location
-job_title = "data analyst"
-job_location = "United States"
-
-search = driver.find_element_by_name("keywords")
-time.sleep(1)
-search.send_keys(job_title)
-
-search = driver.find_element_by_name("location")
-search.clear()
-search.send_keys(job_location)
-
-# Press ENTER
-search.send_keys(Keys.RETURN)
-
-time.sleep(2)
-
-# Applying Filter 
-
-# Filter 1: Job Type = Full Time
-# Click Job Type drop down filter
-button = driver.find_element_by_xpath("//*[contains(text(),'Job Type')]")
-button.click()
-
-# Select Full-time option
-button = driver.find_element_by_xpath("//*[contains(text(),'Full-time')]")
-button.click()
-
-# Click Done
-button = driver.find_element_by_xpath("//button[@type ='submit' and (@data-tracking-control-name='public_jobs_f_JT' or @data-tracking-control-name='f_JT-done-btn')]")
-button.click()
-
-# Filter 2: Experience Level
-button = driver.find_element_by_xpath("//*[contains(text(), 'Experience Level')]")
-button.click()
-
-button = driver.find_element_by_xpath("//*[contains(text(), 'Entry level')]")
-button.click()
-
-button = driver.find_element_by_xpath("//button[@type ='submit' and (@data-tracking-control-name='public_jobs_f_E' or @data-tracking-control-name='f_E-done-btn')]")
-button.click()
-'''
-
-'''
-attrs = []
-for attr in button.get_property('attributes'):
-    attrs.append([attr['name'], attr['value']])
-print(attrs)
-'''
-
-
-#button = driver.find_element_by_xpath("//label[text()='Full-time']")
-#driver.implicitly_wait(10)
-#ActionChains(driver).move_to_element(button).click(button).perform()
-#time.sleep(2)
-#Full-time
-#search = driver.find_element_by_id("JOB_TYPE-1")
-#search.click()
+    # scrape job description
+    jobdesc_xpath = "//div[@class='show-more-less-html__markup']"
+    descs = driver.find_element_by_xpath(jobdesc_xpath).text
+    job_description.append(descs)
+    job_description.append("-----New Job-----")
 
