@@ -9,11 +9,14 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
 import time
 import re
 
 from bs4 import BeautifulSoup as bsp
 from bs4 import NavigableString
+
+import pandas as pd
 # Set path to chromedriver
 PATH_new = "/home/vivek/Codelab/JobHunt/PythonDataScraper/Chromedriver/chromedriver"
 driver = webdriver.Chrome(executable_path=PATH_new)
@@ -28,7 +31,7 @@ driver.get(website)
 time.sleep(2)
 
 #Scroll down to load more job listings
-num_jobs = 300
+num_jobs = 6
 
 # getting the number of jobs listed in the webpage
 
@@ -44,9 +47,9 @@ while(num_jobs_found < num_jobs):
     
     job_list.clear()   
     job_list = lxml_soup.find('ul', class_ = 'jobs-search__results-list')
-    print(f'Collecting info about {num_jobs_found} jobs')
     
     num_jobs_found = int(len(job_list)/4)
+    print(f'Collecting info about {num_jobs_found} jobs')
     
     try:
         button_moreJobs = WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Load more results']")))
@@ -104,8 +107,8 @@ for job in job_list:
     job_date.append(pDate)
 # Scraping job description and qualifications 
 for j_id in range(1,len(job_id)+1):
-#for j_id in range(1,3):
-    #print(f'scrapping {j_id} / {len(job_id)}')
+#for j_id in range(1,6):
+    print(f'scrapping {j_id} / {len(job_id)}')
     
     # Click on individual job listing 
     job_xpath = '/html/body/div[1]/div/main/section[2]/ul/li[{}]'.format(j_id)
@@ -121,3 +124,32 @@ for j_id in range(1,len(job_id)+1):
     descs = driver.find_element_by_xpath(jobdesc_xpath).text
     job_description.append(descs)
 
+# Close the webpage
+driver.close()
+
+# Check list sizes
+
+print("job ID: ", len(job_id))
+print("Title: ", len(job_title))
+print("Company Name: ", len(job_company))
+print("Location: " ,len(job_loc))
+print("Posting Date: ", len(job_date))
+print("Description: ", len(job_description))
+
+# Creating Pandas DataFrame
+job_data = pd.DataFrame({'Job ID' : job_id,
+'Title' : job_title,
+'Company Name' : job_company,
+'Location' : job_loc,
+'Posting Date' : job_date,
+'Description' : job_description
+})
+
+# Cleaning Job Description
+job_data['Description'] = job_data['Description'].str.replace('\n', ' ')
+job_data['Title'] = job_data['Title'].str.replace('\n', '')
+job_data['Company Name'] = job_data['Company Name'].str.replace('\n', '')
+job_data['Location'] = job_data['Location'].str.replace('\n', '')
+print(job_data.head())
+
+job_data.to_csv('LinkedIn_Job_Data.csv', index=0)
