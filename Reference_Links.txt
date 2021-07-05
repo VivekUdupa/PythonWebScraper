@@ -5,3 +5,6 @@ https://selenium-python.readthedocs.io/locating-elements.html
 
 2. COde to copy from 
 https://amandeepsaluja.com/extracting-job-information-from-linkedin-jobs-using-beautifulsoup-and-selenium/
+
+3. Another code 
+https://levelup.gitconnected.com/linkedin-scrapper-a3e6790099b5
