@@ -7,6 +7,8 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 import time
 import re
 
@@ -26,8 +28,7 @@ driver.get(website)
 time.sleep(2)
 
 #Scroll down to load more job listings
-num_jobs = 50
-
+num_jobs = 300
 
 # getting the number of jobs listed in the webpage
 
@@ -35,6 +36,7 @@ num_jobs = 50
 # Scroll to find more jobs
 job_list = []
 num_jobs_found = 0
+delay = 100 #seconds
 while(num_jobs_found < num_jobs):
        
     pageSource = driver.page_source
@@ -42,14 +44,18 @@ while(num_jobs_found < num_jobs):
     
     job_list.clear()   
     job_list = lxml_soup.find('ul', class_ = 'jobs-search__results-list')
-    print(f'Collecting info about {len(job_list)} jobs')
+    print(f'Collecting info about {num_jobs_found} jobs')
     
     num_jobs_found = int(len(job_list)/4)
     
-    body = driver.find_element_by_css_selector('body')
-    body.click()
-    body.send_keys(Keys.PAGE_DOWN)
-    time.sleep(2)
+    try:
+        button_moreJobs = WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Load more results']")))
+        button_moreJobs.click()
+        time.sleep(3)
+    except:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(3)
+        continue
 
 
 # initializing parameters for scraping 
@@ -97,8 +103,8 @@ for job in job_list:
     pDate = job.select_one('time')['datetime']
     job_date.append(pDate)
 # Scraping job description and qualifications 
-#for j_id in range(1,len(job_id)+1):
-for j_id in range(1,3):
+for j_id in range(1,len(job_id)+1):
+#for j_id in range(1,3):
     #print(f'scrapping {j_id} / {len(job_id)}')
     
     # Click on individual job listing 
@@ -115,5 +121,3 @@ for j_id in range(1,3):
     descs = driver.find_element_by_xpath(jobdesc_xpath).text
     job_description.append(descs)
 
-for item, title in enumerate(job_title):
-    print(item, title.strip())
